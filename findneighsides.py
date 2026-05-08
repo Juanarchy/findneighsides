@@ -12,7 +12,6 @@ ncpus = os.cpu_count()
 # Number of rows to dispatch to each task
 chunk_size = 4
 
-num_workers_domain = [1] + list(range(2, ncpus + 1, 2))
 
 
 
@@ -37,7 +36,7 @@ of a non-ramified triangulation, and saves 3 text files containing each:
      X-------V-------X            - ElemNeighSides[m,2] == 0
      
 
-This implementation relies on python's multithreading, GIL-free, capabilities, but the idea should be the same for other multiprocessing libraries. This algorithm can
+This implementation relies on python's multithreading, GIL-free capabilities, but the idea should be the same for other multiprocessing libraries. This algorithm can
 be easily extended to arbitrary (even higher-dimensional) non-ramified tilings by translating "sides" into "faces" and all their concerning instructions.
 
 It also has the option to load a text file containing the indices of cells to remove from the tiling, but I haven't tested what happens if one removes enough cells
@@ -90,14 +89,8 @@ def run_thread_pool(num_workers):
         finally:
             # check for exceptions in worker threads
             [f.result() for f in futurez]
-ts=[]
-for n in (2,3):
-    ElemNeighs=np.zeros_like(elements)
-    ElemNeighSides=np.zeros_like(elements)
-    chunk_size=2**n
-    ts.append((n,timeit('run_thread_pool(ncpus)',number=1, globals=globals())))
 
-print(f'Times: {ts}')
+run_thread_pool(ncpus)
 
 np.savetxt('ElemNeighsFound.txt',ElemNeighs,fmt="%1d")
 np.savetxt('ElemNeighSidesFound.txt',ElemNeighSides,fmt="%1d")
